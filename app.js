@@ -91,7 +91,7 @@ io.sockets.on("connection", function (socket) {
       color:data.color,
       datetime:getDateTime(),
       room:socket.rooms[1],
-      hash:md5(socket.handshake.address).substring(8,24)}
+      hash:md5(socket.rooms[0]).substring(8,24)}
     message.eventEmitter.emit('add', data)
     io.sockets
       .to(socket.rooms[1])

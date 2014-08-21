@@ -70,3 +70,34 @@ body, html {
   height: 100px;
   margin-top: -100px
 }
+
+@media (max-width: 480px) {
+  body {
+    width: 100%;
+    height: auto;
+  }
+
+  .text-input, .msg-input {
+    width: 100%;
+    margin-bottom: 0;
+    border: none;
+    border-bottom: solid 1px #cccccc;
+    -webkit-border-radius: 0;
+  }
+
+  #wrapper {
+    width: 100%;
+    height: auto;
+    min-height: 300px;
+    padding: 0;
+    overflow: normal;
+  }
+  #msg-list {
+    padding: 0 10px;
+  }
+  #message-form {
+    height: auto;
+    padding: 10px 0;
+    margin-top: 0;
+  }
+}
