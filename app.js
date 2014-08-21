@@ -29,7 +29,7 @@ var server = http.createServer(function(req, res) {
     res.writeHead(200, {"Content-Type":"text/html"});
     var header = fs.readFileSync("./header.html", "utf-8")
       , footer = fs.readFileSync("./footer.html", "utf-8")
-      , room = "<div id='room' data-id='"+req.url.substring(6)+"'></div>"
+      , room = "<div id='room' data-url='http://"+req.headers.host+":"+(process.env.APP_PORT || 3000)+"/' data-id='"+req.url.substring(6)+"'></div>"
     res.end(header+room+footer);
     return;
   }

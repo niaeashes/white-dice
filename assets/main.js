@@ -1,5 +1,5 @@
 //  var s = io.connect(); //リモート
-var s = io.connect('http://localhost:3000'); //ローカル
+var s = io.connect($('#connect').attr('data-url')); //ローカル
 
 //サーバから受け取るイベント
 s.on("connect", function () {
@@ -7,7 +7,6 @@ s.on("connect", function () {
 });  // 接続時
 s.on("log", function (data) {
   for ( var i in data ) {
-    console.log(data[i])
     addMessage(data[i])
   }
 })
@@ -30,7 +29,6 @@ function sendMessage() {
   if ( msg == "" || author == "" ) return;
   if ( ! color.match(/^([a-f0-9]{6}|[a-f0-9]{3})$/i) ) {
     color = Math.ceil((Math.random())*0x999999).toString(16)
-    console.log(color)
     $("#color").val(color)
   }
   $("#message").val("");
