@@ -36,7 +36,7 @@ var server = http.createServer(function(req, res) {
 
   var filename = path.join(process.cwd(), "assets"+req.url);
   fs.exists(filename, function(exists) {
-    if ( ! path.extname(filename).match(/^.(css|js|png)$/) || ! exists ) {
+    if ( ! path.extname(filename).match(/^.(css|js|png|wav)$/) || ! exists ) {
       res.writeHead(404, {"Content-Type": "text/plain"});
       res.write("404 Not Found\n");
       res.end();

@@ -1,24 +1,20 @@
-//  var s = io.connect(); //リモート
-var s = io.connect($('#connect').attr('data-url')); //ローカル
+var s = io.connect($('#connect').attr('data-url'))
 
-//サーバから受け取るイベント
-s.on("connect", function () {
-  s.emit("room", {room: $("#room").attr('data-id')});
-});  // 接続時
+s.on("connect", function () {})
+s.on("disconnect", function (client) {})
 s.on("log", function (data) {
-  for ( var i in data ) {
-    addMessage(data[i])
-  }
+  for ( var i in data ) { addMessage(data[i], false) }
 })
-s.on("disconnect", function (client) {});  // 切断時
 s.on("message", function (data) {
-  addMessage(data);
+  addMessage(data, true);
 });
 
 $(document).ready(function() {
   var cookies = GetCookies()
   $("#author").val(cookies.author)
   $("#color").val(cookies.color)
+  $("#audio").attr('checked', cookies.audio == 'true' )
+  s.emit("room", {room: $("#room").attr('data-id')})
   s.emit("log", {room: $("#room").attr('data-id')});
 })
 
@@ -32,27 +28,46 @@ function sendMessage() {
     $("#color").val(color)
   }
   $("#message").val("");
-  document.cookie = "author="+author+"; color="+color+"; path=/room:"+$("#room").attr("data-id")+";"
-  document.cookie = "color="+color+"; path=/room:"+$("#room").attr("data-id")+";"
-  s.emit("message", {"msg":msg, "author":author, "color":color}); //サーバへ送信
+  SetCookies({author: author, color: color, audio: $("#audio").is(':checked')})
+  s.emit("message", {"msg":msg, "author":author, "color":color});
 }
 
-//jqueryでメッセージを追加
-function addMessage (data) {
-  var msg = data.msg.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  var author = data.author.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  var hash = data.hash
-  var diceTag = '';
-  if ( data.dice ) {
-    for ( var i in data.dice) {
-      diceTag = diceTag + "<div class='dice'>"+(1+(1*i))+"回目: "+data.dice[i]+"</div>";
-    }
+function addMessage (data, now) {
+  var msg = Sanitize(data.msg)
+    , author = Sanitize(data.author)
+    , hash = data.hash
+    , diceTag = ''
+  if ( data.dice.length > 0 && now ) { DiceRollSound() }
+  for ( var i in data.dice) {
+    diceTag = diceTag + "<div class='dice'>"+(1+(1*i))+"回目: "+data.dice[i]+"</div>";
   }
   $("#msg-list").prepend("<div class='line'>"+
     "<div class='author' style='color: #"+data.color+"'>"+author+
     "<span class='datetime'>"+data.datetime+"</span>"+
     "<span class='hash'>"+hash+"</span></div>"+
     "<div class='msg'>" + msg + "</div>"+diceTag+"</div>");
+}
+
+function Sanitize(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function DiceRollSound() {
+  if ( ! $("#audio").is(':checked') ) { return }
+  var audio = new Audio("/nc42339.wav")
+  audio.volume = 0.2;
+  audio.play()
+}
+
+function SetCookies(data) {
+  for ( var i in data ) {
+    document.cookie = i+"="+encodeURIComponent(data[i])+"; path=/room:"+$("#room").attr("data-id")+";"
+  }
 }
 
 function GetCookies() {
