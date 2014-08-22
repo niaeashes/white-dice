@@ -27,16 +27,18 @@
 }
 .line .hash {
   font-weight: normal;
-  color: #fafafa;
+  color: #cccccc;
   display: inline-block;
-  margin-left: 5px;
+  margin-left: 15px;
   font-size: 80%;
+  font-family: monospace;
 }
 .line .datetime {
   font-weight: normal;
-  color: #cccccc;
+  color: #aaaaaa;
   display: inline-block;
   margin-left: 5px;
+  font-family: monospace;
   font-size: 80%;
 }
 .line .msg {
@@ -45,6 +47,12 @@
 .line .dice {
   padding-top: 5px;
   padding-left: 12px;
+  color: #444444;
+  font-size: 85%;
+}
+.line .dice strong {
+  color: #000022;
+  font-size: 110%;
 }
 body, html {
   background-color: #222244;

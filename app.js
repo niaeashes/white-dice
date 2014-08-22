@@ -6,6 +6,8 @@ var http = require("http")
   , dice = require("./lib/dice.js")
   , mongoose = require('mongoose')
   , message = require('./lib/message.js')
+  , command = require('./lib/command.js')
+  , skill = require('./lib/skill.js')
 
 mongoose.connect('mongodb://'+(process.env.DBSERVER || 'localhost')+'/'+(process.env.COLLECTION || 'trpg'))
 
@@ -21,17 +23,33 @@ function getDateTime() {
     month = (month < 10 ? "0" : "") + month;
     var day  = date.getDate();
     day = (day < 10 ? "0" : "") + day;
-    return month + " / " + day + " " + hour + " : " + min;
+    return month + "/" + day + " " + hour + ":" + min;
 }
  
 var server = http.createServer(function(req, res) {
   if ( req.url.match(/^\/room:[0-9]+$/) ) {
-    res.writeHead(200, {"Content-Type":"text/html"});
+    res.writeHead(200, {"Content-Type":"text/html"})
     var header = fs.readFileSync("./header.html", "utf-8")
       , footer = fs.readFileSync("./footer.html", "utf-8")
       , room = "<div id='room' data-url='http://"+req.headers.host+":"+(process.env.APP_PORT || 3000)+"/' data-id='"+req.url.substring(6)+"'></div>"
     res.end(header+room+footer);
     return;
+  }
+
+  if ( req.url.match(/^\/?room:[0-9]+\.txt$/) ) {
+    var Reader = require('./lib/reader.js').Reader
+      , reader = new Reader(1*req.url.substring(6).replace('.txt', ''))
+    reader.buildText(function(err, text) {
+      if ( err ) {
+        response.writeHead(500, {"Content-Type": "text/plain"})
+        response.write(err + "\n")
+        response.end()
+        return
+      }
+      res.writeHead(200, {"Content-Type": "text/plane; charset=utf-8"})
+      res.end(text)
+    })
+    return
   }
 
   var filename = path.join(process.cwd(), "assets"+req.url);
@@ -68,7 +86,7 @@ io.sockets.on("connection", function (socket) {
     message.recent('room-'+data.room, 100, function(err, docs) {
       io.sockets
         .to(socket.rooms[0])
-        .emit("log", docs)
+        .emit("log", docs.reverse())
     })
   })
 
@@ -84,18 +102,27 @@ io.sockets.on("connection", function (socket) {
     } catch ( e ) {
       console.log("Error: "+e);
     }
-    var data = {
-      author:data.author,
-      msg:data.msg,
-      dice:results,
-      color:data.color,
-      datetime:getDateTime(),
-      room:socket.rooms[1],
-      hash:md5(socket.rooms[0]).substring(8,24)}
-    message.eventEmitter.emit('add', data)
-    io.sockets
-      .to(socket.rooms[1])
-      .emit("message", data);
+    var title = command.hasTitle(data.msg)
+    if ( title ) {
+      io.sockets.to(socket.rooms[1]).emit("title", {title: title[1].trim()})
+    } else {
+      var data = {
+          author:data.author,
+          msg:data.msg,
+          dice:results,
+          color:data.color,
+          datetime:getDateTime(),
+          room:socket.rooms[1],
+          hash:md5(socket.rooms[0]).substring(8,24)}
+        , to = socket.rooms[1]
+        , loggingMsg = command.checkLogging(data.msg)
+      if ( skill.isSkill(data.msg) ) { data = skill.apply(data) }
+      data = command.applyReplacer(data)
+      if ( loggingMsg ) { message.eventEmitter.emit('add', data) }
+      io.sockets
+        .to(to)
+        .emit("message", data);
+    }
   });
  
   // 切断したときに送信

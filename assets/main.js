@@ -8,6 +8,9 @@ s.on("log", function (data) {
 s.on("message", function (data) {
   addMessage(data, true);
 });
+s.on("title", function(data) {
+  $('title').text(data.title.sanitize())
+})
 
 $(document).ready(function() {
   var cookies = GetCookies()
@@ -33,13 +36,17 @@ function sendMessage() {
 }
 
 function addMessage (data, now) {
-  var msg = Sanitize(data.msg)
-    , author = Sanitize(data.author)
+  var msg = data.msg.sanitize().br()
+    , author = data.author.sanitize()
     , hash = data.hash
     , diceTag = ''
   if ( data.dice.length > 0 && now ) { DiceRollSound() }
   for ( var i in data.dice) {
-    diceTag = diceTag + "<div class='dice'>"+(1+(1*i))+"回目: "+data.dice[i]+"</div>";
+    var diceFace = data.dice[i].sanitize()
+      .strong('[', ']')
+      .color('Success!', '1aa565')
+      .color('Failure...', 'b51d3b')
+    diceTag = diceTag + "<div class='dice'>"+(1+(1*i))+": (ｺﾛｺﾛ…) "+diceFace+"</div>";
   }
   $("#msg-list").prepend("<div class='line'>"+
     "<div class='author' style='color: #"+data.color+"'>"+author+
@@ -48,13 +55,25 @@ function addMessage (data, now) {
     "<div class='msg'>" + msg + "</div>"+diceTag+"</div>");
 }
 
-function Sanitize(str) {
-  return str
+String.prototype.sanitize = function() {
+  return this
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;')
+}
+
+String.prototype.strong = function(start, stop) {
+  return this.replace(start, '<strong>'+start).replace(stop, stop+'</strong>')
+}
+
+String.prototype.br = function() {
+  return this.replace(/\n/g, '<br>')
+}
+
+String.prototype.color = function(target, color) {
+  return this.replace(target, "<span style='color: #"+color.sanitize()+"'>"+target+"</span>")
 }
 
 function DiceRollSound() {
