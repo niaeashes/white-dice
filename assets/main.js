@@ -13,12 +13,18 @@ s.on("title", function(data) {
 })
 
 $(document).ready(function() {
+  $('textarea').on('keydown', function(event) {
+    if (event.keyCode == 13 && ! event.shiftKey) {
+      sendMessage()
+      return false;
+    }
+  })
   var cookies = GetCookies()
   $("#author").val(cookies.author)
   $("#color").val(cookies.color)
   $("#audio").attr('checked', cookies.audio == 'true' )
   s.emit("room", {room: $("#room").attr('data-id')})
-  s.emit("log", {room: $("#room").attr('data-id')});
+  s.emit("log", {room: $("#room").attr('data-id')})
 })
 
 function sendMessage() {
@@ -46,6 +52,7 @@ function addMessage (data, now) {
       .strong('[', ']')
       .color('Success!', '1aa565')
       .color('Failure...', 'b51d3b')
+    if ( data.secret ) { diceFace = '[ 秘密のダイス ]' }
     diceTag = diceTag + "<div class='dice'>"+(1+(1*i))+": (ｺﾛｺﾛ…) "+diceFace+"</div>";
   }
   $("#msg-list").prepend("<div class='line'>"+

@@ -92,36 +92,39 @@ io.sockets.on("connection", function (socket) {
 
   // メッセージ送信（送信者にも送られる）
   socket.on("message", function (data) {
-    try {
-      var results = []
-      if ( dice.hasDice(data.msg) ) {
-        for ( var i = 0; i < dice.getRollCount(data.msg).count; i++ ) {
-          results.push(dice.roll(dice.getRollCount(data.msg).dice));
-        }
-      }
-    } catch ( e ) {
-      console.log("Error: "+e);
-    }
     var title = command.hasTitle(data.msg)
     if ( title ) {
       io.sockets.to(socket.rooms[1]).emit("title", {title: title[1].trim()})
-    } else {
-      var data = {
-          author:data.author,
-          msg:data.msg,
-          dice:results,
-          color:data.color,
-          datetime:getDateTime(),
-          room:socket.rooms[1],
-          hash:md5(socket.rooms[0]).substring(8,24)}
-        , to = socket.rooms[1]
-        , loggingMsg = command.checkLogging(data.msg)
-      if ( skill.isSkill(data.msg) ) { data = skill.apply(data) }
-      data = command.applyReplacer(data)
-      if ( loggingMsg ) { message.eventEmitter.emit('add', data) }
-      io.sockets
-        .to(to)
-        .emit("message", data);
+      return
+    }
+    var data = {
+        author:data.author,
+        msg:data.msg,
+        dice:[],
+        color:data.color,
+        datetime:getDateTime(),
+        room:socket.rooms[1],
+        hash:md5(socket.rooms[0]).substring(8,24),
+        secret: false,
+        to: socket.rooms[1]}
+      , loggingMsg = command.checkLogging(data.msg)
+    data = command.applyReplacer(data)
+    try {
+      if ( dice.hasDice(data.msg) ) {
+        for ( var i = 0; i < dice.getRollCount(data.msg).count; i++ ) {
+          data.dice.push(dice.roll(dice.getRollCount(data.msg).dice))
+        }
+      }
+    } catch ( e ) { console.log("Error: "+e) }
+    if ( skill.isSkill(data.msg) ) { data = skill.apply(data) }
+    if ( loggingMsg ) { message.eventEmitter.emit('add', data) }
+
+    if ( ! data.secret ) {
+      io.sockets.to(data.to).emit("message", data);
+    } else { // is Secret
+      socket.broadcast.to(data.to).emit("message", data);
+      data.secret = false
+      io.sockets.to(socket.rooms[0]).emit("message", data);
     }
   });
  

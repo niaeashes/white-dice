@@ -17,6 +17,8 @@
   outline: none;
   margin-bottom: 5px;
   box-sizing: border-box;
+  height: 30px;
+  resize: none;
 }
 .line {
   margin-top: 8px;
