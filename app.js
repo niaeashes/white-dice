@@ -2,7 +2,6 @@ var http = require("http")
   , socketio = require("socket.io")
   , fs = require("fs")
   , path = require("path")
-  , md5 = require("MD5")
   , dice = require("./lib/dice.js")
   , mongoose = require('mongoose')
   , message = require('./lib/message.js')
@@ -104,7 +103,7 @@ io.sockets.on("connection", function (socket) {
         color:data.color,
         datetime:getDateTime(),
         room:socket.rooms[1],
-        hash:md5(socket.rooms[0]).substring(8,24),
+        hash:command.buildHash(socket.rooms[0]),
         secret: false,
         to: socket.rooms[1]}
       , loggingMsg = command.checkLogging(data.msg)
@@ -115,17 +114,17 @@ io.sockets.on("connection", function (socket) {
           data.dice.push(dice.roll(dice.getRollCount(data.msg).dice))
         }
       }
+      if ( skill.isSkill(data.msg) ) { data = skill.apply(data) }
+      if ( loggingMsg ) { message.eventEmitter.emit('add', data) }
+      if ( typeof data.to == 'function' ) { data.to = data.to(socket, io.sockets.sockets) }
+      if ( ! data.secret ) {
+        io.sockets.to(data.to).emit("message", data);
+      } else { // is Secret
+        socket.broadcast.to(data.to).emit("message", data);
+        data.secret = false
+        io.sockets.to(socket.rooms[0]).emit("message", data);
+      }
     } catch ( e ) { console.log("Error: "+e) }
-    if ( skill.isSkill(data.msg) ) { data = skill.apply(data) }
-    if ( loggingMsg ) { message.eventEmitter.emit('add', data) }
-
-    if ( ! data.secret ) {
-      io.sockets.to(data.to).emit("message", data);
-    } else { // is Secret
-      socket.broadcast.to(data.to).emit("message", data);
-      data.secret = false
-      io.sockets.to(socket.rooms[0]).emit("message", data);
-    }
   });
  
   // 切断したときに送信
