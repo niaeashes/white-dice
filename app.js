@@ -8,7 +8,11 @@ var http = require("http")
   , command = require('./lib/command.js')
   , skill = require('./lib/skill.js')
 
-mongoose.connect('mongodb://'+(process.env.DBSERVER || 'localhost')+'/'+(process.env.COLLECTION || 'trpg'))
+var mongodb = 'mongodb://'+(process.env.DBSERVER || 'localhost')+
+  '/'+(process.env.COLLECTION || 'trpg')
+
+console.log("MongoDB: "+mongodb)
+mongoose.connect(mongodb)
 
 function getDateTime() {
     var date = new Date();
@@ -79,9 +83,6 @@ io.sockets.on("connection", function (socket) {
 
   socket.on("room", function(data) {
     socket.join('room-'+data.room)
-  })
-
-  socket.on("log", function(data) {
     message.recent('room-'+data.room, 100, function(err, docs) {
       io.sockets
         .to(socket.rooms[0])
@@ -89,7 +90,6 @@ io.sockets.on("connection", function (socket) {
     })
   })
 
-  // メッセージ送信（送信者にも送られる）
   socket.on("message", function (data) {
     var title = command.hasTitle(data.msg)
     if ( title ) {
@@ -118,17 +118,14 @@ io.sockets.on("connection", function (socket) {
       if ( loggingMsg ) { message.eventEmitter.emit('add', data) }
       if ( typeof data.to == 'function' ) { data.to = data.to(socket, io.sockets.sockets) }
       if ( ! data.secret ) {
-        io.sockets.to(data.to).emit("message", data);
+        io.sockets.to(data.to).emit("message", data)
       } else { // is Secret
-        socket.broadcast.to(data.to).emit("message", data);
+        socket.broadcast.to(data.to).emit("message", data)
         data.secret = false
-        io.sockets.to(socket.rooms[0]).emit("message", data);
+        io.sockets.to(socket.rooms[0]).emit("message", data)
       }
     } catch ( e ) { console.log("Error: "+e) }
-  });
+  })
  
-  // 切断したときに送信
-  socket.on("disconnect", function () {
-//    io.sockets.emit("S_to_C_message", {value:"user disconnected"});
-  });
-});
+  socket.on("disconnect", function () {})
+})

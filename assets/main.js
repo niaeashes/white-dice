@@ -1,16 +1,19 @@
 var s = io.connect($('#connect').attr('data-url'))
 
 s.on("connect", function () {})
-s.on("disconnect", function (client) {})
-s.on("log", function (data) {
-  for ( var i in data ) { addMessage(data[i], false) }
+s.on("disconnect", function (client) {
+  addMessage({
+    author: 'System',
+    msg: 'サーバーがダウンしたかなにかで接続が切れました。リロードしてください。',
+    color: 'aaaaaa',
+    dice: [],
+    datetime: '???',
+    hash: ''
+  }, true);
 })
-s.on("message", function (data) {
-  addMessage(data, true);
-});
-s.on("title", function(data) {
-  $('title').text(data.title.sanitize())
-})
+s.on("log", function (data) { for ( var i in data ) { addMessage(data[i], false) } })
+s.on("message", function (data) { addMessage(data, true) })
+s.on("title", function(data) { $('title').text(data.title.sanitize()) })
 
 $(document).ready(function() {
   $('textarea').on('keydown', function(event) {
@@ -24,7 +27,6 @@ $(document).ready(function() {
   $("#color").val(cookies.color)
   $("#audio").attr('checked', cookies.audio == 'true' )
   s.emit("room", {room: $("#room").attr('data-id')})
-  s.emit("log", {room: $("#room").attr('data-id')})
 })
 
 function sendMessage() {
