@@ -1,3 +1,6 @@
+require('./lib/string.extend.js')
+require('./lib/date.extend.js')
+
 var mongoose = require('mongoose')
   , builder = require('./lib/builder.js')
   , listen = require('./lib/listen')
@@ -14,6 +17,7 @@ mongoose.connect(mongodb)
 
 app.get(/^\/room:[0-9]+$/, builder.buildHtml)
 app.get(/^\/room:[0-9]+\.txt$/, builder.buildText)
+app.get(/^\/room:[0-9]+\.log\.html$/, builder.buildLogHtml.bind(builder))
 app.use(require('express').static(__dirname+'/assets'))
 
 io.on("connection", function (socket) { new listen(io, socket)})
