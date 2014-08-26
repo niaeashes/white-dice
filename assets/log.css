@@ -5,12 +5,34 @@ html, body {
   margin: 0;
 }
 
-.block {
-  background-color: #ffffff;
-  padding: 10px;
+body {
   width: 960px;
   margin-right: auto;
   margin-left: auto;
+}
+
+#main {
+  width: 700px;
+  min-height: 10px;
+  margin-left: 260px;
+}
+
+#sidebar {
+  width: 220px;
+  min-height: 10px;
+  float: left;
+  padding: 10px;
+  background-color: #ffffff;
+}
+
+#sidebar ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.block {
+  background-color: #ffffff;
+  padding: 10px;
   margin-bottom: 40px;
 }
 

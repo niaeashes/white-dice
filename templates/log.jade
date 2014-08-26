@@ -5,19 +5,31 @@ html(lang=ja)
     title= pageTitle
     link(rel="stylesheet", href="log.css")
   body
-    - var prev = {updated: new Date(0)}
-    .block
-      each message in messages
-        if Math.round(( message.updated - prev.updated ) / 1000 ) > 4*60*60
-          if prev.msg
-            != '</div><div class="block">'
-          p.date-separator= message.updated.toStringDateHour()
-        .line
-          if prev.author != message.author || Math.round(( message.updated - prev.updated ) / 1000 ) > 5*60
-            p.author(style="color: #"+message.color)
-              span.time= message.updated.toStringTime()
-              = " "+message.author
-          p.msg!=message.msg.sanitize().br()
-          each dice in message.dice
-            p.dice=dice
+    #sidebar
+      - var prev = {updated: new Date(0)}
+      ul
+        each message in messages
+          if Math.round(( message.updated - prev.updated ) / 1000 ) > 4*60*60
+            li
+              a(href="#"+md5(message.updated.toStringDateHour()))
+                = message.updated.toStringDateHour()
           - prev = message
+    #main
+      - var prev = {updated: new Date(0)}
+      .block
+        each message in messages
+          if Math.round(( message.updated - prev.updated ) / 1000 ) > 4*60*60
+            if prev.msg
+              != '</div><div class="block">'
+            p.date-separator
+              a(name=md5(message.updated.toStringDateHour()))
+              = message.updated.toStringDateHour()
+          .line
+            if prev.author != message.author || Math.round(( message.updated - prev.updated ) / 1000 ) > 5*60
+              p.author(style="color: #"+message.color)
+                span.time= message.updated.toStringTime()
+                = " "+message.author
+            p.msg!=message.msg.sanitize().br()
+            each dice in message.dice
+              p.dice=dice
+            - prev = message
