@@ -15,9 +15,13 @@ var mongodb = 'mongodb://'+(process.env.DBSERVER || 'localhost')+
 console.log("MongoDB: "+mongodb)
 mongoose.connect(mongodb)
 
-app.get(/^\/room:[0-9]+$/, builder.buildHtml)
-app.get(/^\/room:[0-9]+\.txt$/, builder.buildText)
-app.get(/^\/room:[0-9]+\.log\.html$/, builder.buildLogHtml.bind(builder))
+app.get(/^\/room:[0-9]+$/, builder.roomHtml)
+app.get(/^\/room:[0-9]+\.txt$/, builder.roomText)
+app.get(/^\/room:[0-9]+\.log\.html$/, builder.logHtml.bind(builder))
+
+app.get(/^\/map:[0-9]+$/, builder.mapHtml)
+app.get(/^\/map:[0-9]+/owner$/, builder.mapOwnerHtml)
+
 app.use(require('express').static(__dirname+'/assets'))
 
 io.on("connection", function (socket) { new listen(io, socket)})
