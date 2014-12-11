@@ -10,7 +10,7 @@ var mongoose = require('mongoose')
 
 var mongodb = 'mongodb://'+(process.env.DBSERVER || 'localhost')+
   '/'+(process.env.COLLECTION || 'trpg')
-  , port = ( process.env.APP_PORT || 3000 )
+  , port = ( process.env.PORT || 3000 )
 
 console.log("MongoDB: "+mongodb)
 mongoose.connect(mongodb)
