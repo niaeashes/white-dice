@@ -10,6 +10,7 @@
         "MD5": "1.2.x",
         "mongoose": "3.8.x",
         "jade": "1.5.x"
+        "bson": "0.3.x"
     },
     "private": true,
     "license": "MIT"
