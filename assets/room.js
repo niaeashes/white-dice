@@ -53,7 +53,11 @@ function addMessage (data, now) {
     var diceFace = data.dice[i].sanitize()
       .strong('[', ']')
       .color('Success!', '1aa565')
+      .color('効果的成功', '1aa565')
+      .color('成功', '1aa565')
       .color('Failure...', 'b51d3b')
+      .color('致命的失敗', 'b51d3b')
+      .color('失敗', 'b51d3b')
     if ( data.secret ) { diceFace = '[ 秘密のダイス ]' }
     diceTag = diceTag + "<div class='dice'>"+(1+(1*i))+": (ｺﾛｺﾛ…) "+diceFace+"</div>";
   }
