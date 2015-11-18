@@ -78,7 +78,7 @@ String.prototype.sanitize = function() {
 }
 
 String.prototype.strong = function(start, stop) {
-  return this.replace(start, '<strong>'+start).replace(stop, stop+'</strong>')
+  return this.replace(new RegExp(escapeRegExp(start), 'g'), '<strong>'+start).replace(new RegExp(escapeRegExp(stop), 'g'), stop+'</strong>')
 }
 
 String.prototype.br = function() {
@@ -87,6 +87,10 @@ String.prototype.br = function() {
 
 String.prototype.color = function(target, color) {
   return this.replace(target, "<span style='color: #"+color.sanitize()+"'>"+target+"</span>")
+}
+
+function escapeRegExp(str) {
+  return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 }
 
 function DiceRollSound() {
