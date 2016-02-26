@@ -26,6 +26,10 @@ $(document).ready(function() {
   $("#author").val(cookies.author)
   $("#color").val(cookies.color)
   $("#audio").attr('checked', cookies.audio == 'true' )
+  $(document).on("click", ".copy", function() {
+    var text = $(this).text()
+    $("#message").val(text).focus()
+  })
   s.emit("room", {room: $("#room").attr('data-id')})
 })
 
@@ -53,11 +57,14 @@ function addMessage (data, now) {
     var diceFace = data.dice[i].sanitize()
       .strong('[', ']')
       .color('Success!', '1aa565')
+      .color('Finish!', '1aa565')
+      .color('Critical!', '1a6da5')
       .color('効果的成功', '1aa565')
       .color('成功', '1aa565')
       .color('Failure...', 'b51d3b')
       .color('致命的失敗', 'b51d3b')
       .color('失敗', 'b51d3b')
+      .copyTag()
     if ( data.secret ) { diceFace = '[ 秘密のダイス ]' }
     diceTag = diceTag + "<div class='dice'>"+(1+(1*i))+": (ｺﾛｺﾛ…) "+diceFace+"</div>";
   }
@@ -87,6 +94,10 @@ String.prototype.br = function() {
 
 String.prototype.color = function(target, color) {
   return this.replace(target, "<span style='color: #"+color.sanitize()+"'>"+target+"</span>")
+}
+
+String.prototype.copyTag = function() {
+  return this.replace('{', '<span class="copy">').replace('}', '</span>')
 }
 
 function escapeRegExp(str) {
