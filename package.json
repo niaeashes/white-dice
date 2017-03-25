@@ -6,14 +6,8 @@
     "url": "https://github.com/niaeashes/white-dice"
   },
   "dependencies": {
-    "bson": "^1.0.4",
     "discord.js": "^11.0.0",
-    "express": "4.8.x",
-    "jade": "1.5.x",
-    "mathjs": "^3.10.0",
-    "md5": "2.x",
-    "mongoose": "^4.9.1",
-    "socket.io": "1.0.x"
+    "mathjs": "^3.10.0"
   },
   "private": true,
   "license": "MIT"

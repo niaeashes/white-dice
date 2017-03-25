@@ -22,8 +22,7 @@ client.on('message', function(message) {
   messageParser(data, function(data) {
     console.log(data);
     if ( data.dice.length == 0 ) return;
-    var msg = [];
-    msg.push(data.dice.join(', '));
+    var msg = data.dice;
     if ( data.usedParameters.length > 0 ) {
       msg.push('')
     }
@@ -31,7 +30,12 @@ client.on('message', function(message) {
       var parameter = data.usedParameters[i]
       msg.push(parameter.name+": "+parameter.value);
     }
-    message.channel.sendMessage(msg.join("\n"))
+    for ( var i in msg ) {
+      message.channel.sendMessage(msg[i])
+        .then(function(err, doc) {
+          console.log("Response:", err, doc);
+        })
+    }
   });
 });
 
