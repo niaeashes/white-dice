@@ -1,4 +1,5 @@
 import { Command as CocCommand, Result as CocResult } from '../lib/coc'
+import GeneralResponse from '../lib/generalResponse'
 
 import expect from 'expect.js'
 
@@ -99,6 +100,16 @@ describe('CocCommand', () => {
     it('pass with penalty dices', (done) => {
       let command = new CocCommand("coc60-----")
       expect(command.roll()).to.be.a(CocResult)
+      done()
+    })
+
+  })
+
+  describe('.run()', () => {
+
+    it('responses GeneralResponse', (done) => {
+      let command = new CocCommand("coc60")
+      expect(command.run()).to.be.a(GeneralResponse)
       done()
     })
 

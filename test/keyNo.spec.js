@@ -1,4 +1,5 @@
 import { Matcher as KeyNoMatcher, Command as KeyNoCommand } from '../lib/keyNo'
+import GeneralResponse from '../lib/generalResponse'
 
 import expect from 'expect.js'
 
@@ -47,6 +48,16 @@ describe('KeyNoCommand', () => {
     it('equals +8 with k10+8', (done) => {
       let keyNo = new KeyNoCommand("k10+8")
       expect(keyNo.exp).to.eql("+8")
+      done()
+    })
+
+  })
+
+  describe('.run()', () => {
+
+    it('responses GeneralResponse', (done) => {
+      let command = new KeyNoCommand("k10c8")
+      expect(command.run()).to.be.a(GeneralResponse)
       done()
     })
 

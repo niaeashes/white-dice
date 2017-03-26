@@ -1,6 +1,7 @@
 import { Matcher as DxMatcher, Command as DxCommand, Result as DxResult } from '../lib/dx'
 import Dice from '../lib/dice'
 import RollResult from '../lib/rollResult'
+import GeneralResponse from '../lib/generalResponse'
 
 import expect from 'expect.js'
 
@@ -49,6 +50,16 @@ describe('DxResult', () => {
     it('returns 10 with [8, 5, 1] and critical', (done) => {
       const result = new DxResult(new RollResult([8, 5, 1], new Dice("3D10")), new DxCommand(3, 7))
       expect(result.value).to.eql(10)
+      done()
+    })
+
+  })
+
+  describe('.run()', () => {
+
+    it('responses GeneralResponse', (done) => {
+      let command = new DxCommand("10dx10")
+      expect(command.run()).to.be.a(GeneralResponse)
       done()
     })
 

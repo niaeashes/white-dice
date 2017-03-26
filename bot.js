@@ -3,26 +3,36 @@ import "./lib/array.extend"
 
 import Discord from 'discord.js';
 import Command from './lib/command'
-import Message from './lib/message'
+import DiscordMessage from './lib/discordMessage'
+import NextRollContainer from './lib/nextRollContainer'
 
 const SPACES_PATTERN = /(\s|\t|\u3000|\uA0|[\u2002-\u200B])/
 
-let client = new Discord.Client();
+let client = new Discord.Client()
+let nextRolls = new NextRollContainer()
 
 client.on('message', function(message) {
   if ( message.author.bot ) return;
 
   const lines = message.content.split(/\n/)
+  const uid = `${message.channel.id}.#{message.author.id}`
 
   lines.forEach((line) => {
 
-    const commandBody = line.split(SPACES_PATTERN, 2)[0]
-    let command = new Command(commandBody.requestParse())
+    let commandBody = line.split(SPACES_PATTERN, 2)[0].requestParse()
+    if ( !! commandBody.match(/^p(ush)?/) ) {
+      commandBody = nextRolls.find(uid)
+      message.channel.send(commandBody)
+    }
+    let command = new Command(commandBody)
+
     if ( ! command.valid ) return
 
-    let newMessage = new Message()
+    let newMessage = new DiscordMessage()
     command.targets.forEach(targetCommand => {
-      newMessage.push(targetCommand.run())
+      let response = targetCommand.run()
+      newMessage.push(response)
+      nextRolls.register(uid, response.nextCommand)
     })
 
     message.channel.send(newMessage.content, newMessage.options)
