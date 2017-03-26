@@ -5,10 +5,21 @@
     "type": "git",
     "url": "https://github.com/niaeashes/white-dice"
   },
+  "scripts": {
+    "test": "mocha --compilers js:babel-core/register --watch ./test/**/*.spec.js"
+  },
   "dependencies": {
     "discord.js": "^11.0.0",
-    "mathjs": "^3.10.0"
+    "mathjs": "^3.10.0",
+    "mersenne-twister": "^1.1.0"
   },
   "private": true,
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-core": "^6.24.0",
+    "babel-preset-es2015": "^6.24.0",
+    "expect.js": "^0.3.1",
+    "mocha": "^3.2.0"
+  }
 }

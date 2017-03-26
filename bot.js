@@ -1,42 +1,74 @@
-require('./lib/string.extend.js')
-require('./lib/date.extend.js')
+import "./lib/string.extend"
+import "./lib/array.extend"
 
-var listen = require('./lib/listen')
-  , messageParser = require('./lib/messageParser.js')
-  , parameterSpace = require('./lib/parameterSpace.js')
+import Discord from 'discord.js';
+import Command from './lib/command'
+import Message from './lib/message'
 
-var Discord = require('discord.js');
-var client = new Discord.Client();
+const SPACES_PATTERN = /(\s|\t|\u3000|\uA0|[\u2002-\u200B])/
+
+let client = new Discord.Client();
 
 client.on('message', function(message) {
-  console.log(message);
-  data = {
-    author: message.author.username,
-    msg: message.content,
-    usedParameters: []
-  };
-  var loadedParameter = parameterSpace.load(message.author.username);
-  if ( loadedParameter ) {
-    data.parameters = loadedParameter.parameters;
-  }
-  messageParser(data, function(data) {
-    console.log(data);
-    if ( data.dice.length == 0 ) return;
-    var msg = data.dice;
-    if ( data.usedParameters.length > 0 ) {
-      msg.push('')
-    }
-    for ( var i in data.usedParameters ) {
-      var parameter = data.usedParameters[i]
-      msg.push(parameter.name+": "+parameter.value);
-    }
-    for ( var i in msg ) {
-      message.channel.sendMessage(msg[i])
-        .then(function(err, doc) {
-          console.log("Response:", err, doc);
-        })
-    }
-  });
+  if ( message.author.bot ) return;
+
+  const lines = message.content.split(/\n/)
+
+  lines.forEach((line) => {
+
+    const commandBody = line.split(SPACES_PATTERN, 2)[0]
+    let command = new Command(commandBody.requestParse())
+    if ( ! command.valid ) return
+
+    let newMessage = new Message()
+    command.targets.forEach(targetCommand => {
+      newMessage.push(targetCommand.run())
+    })
+
+    message.channel.send(newMessage.content, newMessage.options)
+      .then((doc) => {
+        console.log("Done: ", newMessage)
+      })
+      .catch((err) => {
+        console.log("Error: ", newMessage, err)
+      })
+
+  })
+
+  return
+  message.channel.send("", {
+    embed: {
+      title: "Title",
+      description: "This is a description",
+      url: "https://nianote.com",
+      timestamp: ( new Date() ),
+      color: 456789,
+      fields: [
+        { name: "Field A", value: "Value", inline: true },
+        { name: "Field B", value: "Value", inline: true },
+        { name: "Field C", value: "Value", inline: true }
+      ],
+      footer: {
+        text: "Footer Text",
+        title: "Title",
+        icon_url: "https://pbs.twimg.com/profile_images/749831918766608384/SkVxv_2A.jpg"
+      },
+      author: {
+        name: "Nia",
+        icon_url: "https://pbs.twimg.com/profile_images/749831918766608384/SkVxv_2A.jpg"
+      },
+      image: {
+        url: "https://pbs.twimg.com/profile_images/749831918766608384/SkVxv_2A.jpg"
+      }
+    },
+    disableEveryone: true
+  })
+  .then(function(doc) {
+    console.log("Response:", doc);
+  })
+  .catch(function(err) {
+    console.log("Response:", err);
+  })
 });
 
 client.login(process.env.TOKEN);
