@@ -59,6 +59,12 @@ describe('CocCommand', () => {
       done()
     })
 
+    it('equals 30 with coc10vs14', (done) => {
+      let command = new CocCommand("coc10vs14")
+      expect(command.rate).to.eql(30)
+      done()
+    })
+
   })
 
   describe('.additionalDices', () => {
