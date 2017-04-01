@@ -1,4 +1,4 @@
-import Dice from '../lib/dice'
+import Dice, { Command as DiceCommand } from '../lib/dice'
 import RollResult from '../lib/rollResult'
 
 import expect from 'expect.js'
@@ -74,6 +74,38 @@ describe('Dice', () => {
         expect(result).to.greaterThan(-1)
         expect(result).to.lessThan(10)
       })
+      done()
+    })
+
+  })
+
+})
+
+describe('DiceCommand', () => {
+
+  describe('.roll()', () => {
+
+    it('roll 2D6', (done) => {
+      let command = new DiceCommand('2D6')
+      let results = command.roll()
+      expect(results.length).to.eql(1)
+      expect(results[0].size).to.eql(2)
+      done()
+    })
+
+  })
+
+  describe('.run()', () => {
+
+    it('roll 2D6', (done) => {
+      let command = new DiceCommand('2D6')
+      let result = command.run()
+      done()
+    })
+
+    it('roll 2D6+6', (done) => {
+      let command = new DiceCommand('2D6+6')
+      let result = command.run()
       done()
     })
 

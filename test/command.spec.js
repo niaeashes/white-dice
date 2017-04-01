@@ -10,23 +10,19 @@ describe('Command', () => {
 
     it('returns Array', (done) => {
       let command = new Command('sample')
-      expect(command.targets).to.be.a(Array)
+      expect(command.target).to.be(null)
       done()
     })
 
     it('includes CocCommand', (done) => {
       let command = new Command('coc60')
-      command.targets.forEach(target => {
-        expect(target).to.be.a(CocCommand)
-      })
+      expect(command.target).to.be.a(CocCommand)
       done()
     })
 
     it('does NOT include CocCommand', (done) => {
       let command = new Command('sample')
-      command.targets.forEach(target => {
-        expect(target).not.to.be.a(CocCommand)
-      })
+      expect(command.target).not.to.be.a(CocCommand)
       done()
     })
 
