@@ -15,6 +15,7 @@ client.on('message', function(message) {
     msg: message.content,
     usedParameters: []
   };
+  if (data.author == 'white-dice') { return }
   var loadedParameter = parameterSpace.load(message.author.username);
   if ( loadedParameter ) {
     data.parameters = loadedParameter.parameters;
