@@ -12,7 +12,7 @@
     "jade": "1.5.x",
     "mathjs": "^3.10.0",
     "md5": "2.x",
-    "mongoose": "^4.9.1",
+    "mongoose": "^5.7.5",
     "socket.io": "1.0.x"
   },
   "private": true,
