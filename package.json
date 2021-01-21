@@ -13,7 +13,7 @@
     "mathjs": "^3.10.0",
     "md5": "2.x",
     "mongoose": "^4.9.1",
-    "socket.io": "1.0.x"
+    "socket.io": "2.4.x"
   },
   "private": true,
   "license": "MIT"
